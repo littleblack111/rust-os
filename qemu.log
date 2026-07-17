@@ -1,0 +1,5 @@
+limine: Loading executable `boot():/boot/rust-os`...
+Entered _start!
+BASE_REVISION not supported!
+Hello World!
+qemu-system-x86_64: terminating on signal 15 from pid 773461 (timeout)

@@ -11,3 +11,6 @@ rejected because:
   - due to that it's tightly coupled with it
 #link("https://crates.io/crates/limine")[limine]
 - cons: no documentation
+
+== spinlock
+thanks ("https://www.reddit.com/r/cpp/comments/1w6us70/optimizing_a_spinlock/")[this reddit post] and subsequently ("https://david.alvarezrosa.com/posts/optimizing-a-spin-lock/")[this blog] making me realize this was even a possibility

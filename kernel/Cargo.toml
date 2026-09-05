@@ -1,0 +1,8 @@
+[package]
+name = "kernel"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bootloader_api = { git = "https://github.com/rust-osdev/bootloader" }
+uart_16550 = "0.8.0"

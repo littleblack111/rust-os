@@ -1,8 +1,12 @@
+use core::array;
+
+use strum::{EnumIter, IntoEnumIterator};
 use uart_16550::{
     Config, Uart16550Tty, Uart16550TtyError,
     backend::{PioBackend, PortIoAddress},
 };
 
+#[derive(EnumIter)]
 #[repr(u16)]
 // TODO: parse & validate via acpi alors scratch
 enum SerialPortAddress {
@@ -35,23 +39,15 @@ impl Uart16550 {
         // TODO: more type safe
         mut config: [Option<Config>; 4],
     ) -> Result<Self, Uart16550TtyError<PortIoAddress>> {
-        unsafe {
-            Ok(Self {
-                coms: [
-                    init_port(&mut config[0], SerialPortAddress::COM1)?,
-                    init_port(&mut config[1], SerialPortAddress::COM2)?,
-                    init_port(&mut config[2], SerialPortAddress::COM3)?,
-                    init_port(&mut config[3], SerialPortAddress::COM4)?,
-                ],
-            })
-        }
-    }
-}
+        let mut addrs = SerialPortAddress::iter();
 
-#[inline(always)]
-unsafe fn init_port(
-    cfg: &mut Option<Config>,
-    addr: SerialPortAddress,
-) -> Result<Option<Uart16550Tty<PioBackend>>, Uart16550TtyError<PortIoAddress>> {
-    cfg.take().map(|c| unsafe { Uart16550Tty::new_port(addr.into(), c) }).transpose()
+        Ok(Self {
+            coms: array::try_from_fn(|i| {
+                config[i]
+                    .take()
+                    .map(|c| unsafe { Uart16550Tty::new_port(addrs.next().unwrap().into(), c) })
+                    .transpose()
+            })?,
+        })
+    }
 }

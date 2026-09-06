@@ -11,6 +11,7 @@ bootloader_api = { git = "https://github.com/rust-osdev/bootloader" }
 bytemuck = { version = "1.25.2", features = ["derive"] }
 linkme = "0.3.37"
 spin = "0.12.3"
+strum = { version = "0.28.0", default-features = false, features = ["derive", "strum_macros"] }
 uart_16550 = "0.8.0"
 
 [profile.dev]

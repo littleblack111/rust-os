@@ -3,11 +3,12 @@ use spin::{lazylock::LazyLock, mutex::Mutex};
 use crate::io::output::serial::uart_16550::Uart16550;
 
 // TODO: use linkme instead
-pub static EARLY_PRINTK_SERIAL: LazyLock<Option<Mutex<Uart16550>>> =
-    LazyLock::new(|| match unsafe { Uart16550::init([const { None }; 4]) } {
+pub static EARLY_PRINTK_SERIAL: LazyLock<Option<Mutex<Uart16550>>> = LazyLock::new(|| {
+    match unsafe { Uart16550::init([Some(Default::default()), None, None, None]) } {
         Ok(o) => Some(Mutex::new(o)),
         Err(_) => None,
-    });
+    }
+});
 
 #[macro_export]
 // TODO: configurable via option or arguments

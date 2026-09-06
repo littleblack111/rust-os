@@ -5,11 +5,11 @@ use uart_16550::{
 
 #[repr(u16)]
 // TODO: parse & validate via acpi alors scratch
-pub enum SerialPortAddress {
+enum SerialPortAddress {
     COM1 = 0x3F8,
-    Com2 = 0x2F8,
-    Com3 = 0x3E8,
-    Com4 = 0x2E8,
+    COM2 = 0x2F8,
+    COM3 = 0x3E8,
+    COM4 = 0x2E8,
 }
 
 impl From<SerialPortAddress> for u16 {
@@ -22,14 +22,6 @@ pub struct Uart16550 {
     pub coms: [Option<Uart16550Tty<PioBackend>>; 4],
 }
 
-#[inline(always)]
-fn init_port(
-    cfg: &mut Option<Config>,
-    addr: SerialPortAddress,
-) -> Result<Option<Uart16550Tty<PioBackend>>, Uart16550TtyError<PortIoAddress>> {
-    cfg.take().map(|c| unsafe { Uart16550Tty::new_port(addr.into(), c) }).transpose()
-}
-
 impl Uart16550 {
     /// # Safety
     ///
@@ -40,17 +32,26 @@ impl Uart16550 {
     ///
     /// [`NUM_REGISTERS`]: crate::spec::NUM_REGISTERS
     pub unsafe fn init(
+        // TODO: more type safe
         mut config: [Option<Config>; 4],
     ) -> Result<Self, Uart16550TtyError<PortIoAddress>> {
         unsafe {
             Ok(Self {
                 coms: [
                     init_port(&mut config[0], SerialPortAddress::COM1)?,
-                    init_port(&mut config[1], SerialPortAddress::Com2)?,
-                    init_port(&mut config[2], SerialPortAddress::Com3)?,
-                    init_port(&mut config[3], SerialPortAddress::Com4)?,
+                    init_port(&mut config[1], SerialPortAddress::COM2)?,
+                    init_port(&mut config[2], SerialPortAddress::COM3)?,
+                    init_port(&mut config[3], SerialPortAddress::COM4)?,
                 ],
             })
         }
     }
+}
+
+#[inline(always)]
+unsafe fn init_port(
+    cfg: &mut Option<Config>,
+    addr: SerialPortAddress,
+) -> Result<Option<Uart16550Tty<PioBackend>>, Uart16550TtyError<PortIoAddress>> {
+    cfg.take().map(|c| unsafe { Uart16550Tty::new_port(addr.into(), c) }).transpose()
 }

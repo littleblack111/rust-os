@@ -1,4 +1,3 @@
-use bitflags::bitflags;
 use uart_16550::{
     Config, Uart16550Tty, Uart16550TtyError,
     backend::{PioBackend, PortIoAddress},
@@ -13,15 +12,6 @@ pub enum SerialPortAddress {
     Com4 = 0x2E8,
 }
 
-bitflags! {
-    pub struct SerialPortBitMask: u8 {
-        const COM1 = 1 << 0;
-        const COM2 = 1 << 1;
-        const COM3 = 1 << 2;
-        const COM4 = 1 << 3;
-    }
-}
-
 impl From<SerialPortAddress> for u16 {
     fn from(value: SerialPortAddress) -> Self {
         value as u16
@@ -30,6 +20,14 @@ impl From<SerialPortAddress> for u16 {
 
 pub struct Uart16550 {
     pub coms: [Option<Uart16550Tty<PioBackend>>; 4],
+}
+
+#[inline(always)]
+fn init_port(
+    cfg: &mut Option<Config>,
+    addr: SerialPortAddress,
+) -> Result<Option<Uart16550Tty<PioBackend>>, Uart16550TtyError<PortIoAddress>> {
+    cfg.take().map(|c| unsafe { Uart16550Tty::new_port(addr.into(), c) }).transpose()
 }
 
 impl Uart16550 {
@@ -42,44 +40,15 @@ impl Uart16550 {
     ///
     /// [`NUM_REGISTERS`]: crate::spec::NUM_REGISTERS
     pub unsafe fn init(
-        coms_enabled: SerialPortBitMask,
         mut config: [Option<Config>; 4],
     ) -> Result<Self, Uart16550TtyError<PortIoAddress>> {
         unsafe {
             Ok(Self {
                 coms: [
-                    if coms_enabled.contains(SerialPortBitMask::COM1) {
-                        Some(Uart16550Tty::new_port(
-                            SerialPortAddress::COM1.into(),
-                            config[0].take().unwrap_or_default(),
-                        )?)
-                    } else {
-                        None
-                    },
-                    if coms_enabled.contains(SerialPortBitMask::COM2) {
-                        Some(Uart16550Tty::new_port(
-                            SerialPortAddress::Com2.into(),
-                            config[1].take().unwrap_or_default(),
-                        )?)
-                    } else {
-                        None
-                    },
-                    if coms_enabled.contains(SerialPortBitMask::COM3) {
-                        Some(Uart16550Tty::new_port(
-                            SerialPortAddress::Com3.into(),
-                            config[2].take().unwrap_or_default(),
-                        )?)
-                    } else {
-                        None
-                    },
-                    if coms_enabled.contains(SerialPortBitMask::COM4) {
-                        Some(Uart16550Tty::new_port(
-                            SerialPortAddress::Com4.into(),
-                            config[3].take().unwrap_or_default(),
-                        )?)
-                    } else {
-                        None
-                    },
+                    init_port(&mut config[0], SerialPortAddress::COM1)?,
+                    init_port(&mut config[1], SerialPortAddress::Com2)?,
+                    init_port(&mut config[2], SerialPortAddress::Com3)?,
+                    init_port(&mut config[3], SerialPortAddress::Com4)?,
                 ],
             })
         }

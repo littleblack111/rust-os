@@ -1,11 +1,12 @@
-use core::ops::Deref;
+use core::{ops::Deref, sync::atomic::Ordering};
 
 use atomic::Atomic;
+use bytemuck::{Pod, Zeroable};
 
-static KERNEL_VIRTUAL_BASE: Atomic<PhysicalMemoryAddress> =
-    Atomic::new(PhysicalMemoryAddress(0xFFFFFFFF80000000));
+static KERNEL_VIRTUAL_BASE: Atomic<PhysicalMemoryAddress> = Atomic::new(PhysicalMemoryAddress(0));
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+#[repr(transparent)]
 pub struct VirtualMemoryAddress(pub usize);
 
 impl Deref for VirtualMemoryAddress {
@@ -18,23 +19,24 @@ impl Deref for VirtualMemoryAddress {
 
 impl From<usize> for VirtualMemoryAddress {
     fn from(value: usize) -> Self {
-        VirtualMemoryAddress(value)
+        Self(value)
     }
 }
 
 impl From<VirtualMemoryAddress> for usize {
     fn from(value: VirtualMemoryAddress) -> Self {
-        value.0
+        *value
     }
 }
 
 impl From<PhysicalMemoryAddress> for VirtualMemoryAddress {
     fn from(value: PhysicalMemoryAddress) -> Self {
-        VirtualMemoryAddress(value.0)
+        VirtualMemoryAddress(*value + *KERNEL_VIRTUAL_BASE.load(Ordering::Relaxed))
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Pod, Zeroable)]
+#[repr(transparent)]
 pub struct PhysicalMemoryAddress(pub usize);
 
 impl Deref for PhysicalMemoryAddress {
@@ -53,13 +55,13 @@ impl From<usize> for PhysicalMemoryAddress {
 
 impl From<PhysicalMemoryAddress> for usize {
     fn from(value: PhysicalMemoryAddress) -> Self {
-        value.0
+        *value
     }
 }
 
 impl From<VirtualMemoryAddress> for PhysicalMemoryAddress {
     fn from(value: VirtualMemoryAddress) -> Self {
-        PhysicalMemoryAddress(value.0)
+        PhysicalMemoryAddress(*value - *KERNEL_VIRTUAL_BASE.load(Ordering::Relaxed))
     }
 }
 
@@ -94,7 +96,16 @@ impl From<MemoryAddress> for VirtualMemoryAddress {
     fn from(value: MemoryAddress) -> Self {
         match value {
             MemoryAddress::Virtual(v) => v,
-            MemoryAddress::Physical(p) => VirtualMemoryAddress(p.0),
+            MemoryAddress::Physical(p) => p.into(),
+        }
+    }
+}
+
+impl From<MemoryAddress> for PhysicalMemoryAddress {
+    fn from(value: MemoryAddress) -> Self {
+        match value {
+            MemoryAddress::Virtual(v) => v.into(),
+            MemoryAddress::Physical(p) => p,
         }
     }
 }

@@ -26,7 +26,7 @@ macro_rules! printk {
 }
 
 #[macro_export]
-macro_rules! printkln {
+macro_rules! printlnk {
 	($($arg:tt)*) => ({
 		use ::core::fmt::Write;
 		match &*$crate::init::earlyprintk::EARLY_PRINTK_SERIAL {

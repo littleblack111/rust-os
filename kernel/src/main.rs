@@ -1,27 +1,15 @@
 #![no_std]
 #![no_main]
-#![feature(used_with_arg)]
 
 // extern crate alloc;
 
-use bootloader_api::{BootInfo, BootloaderConfig, entry_point};
-use core::fmt::Write;
-use kernel::{io::output::serial::uart_16550::Uart16550, pm::hcf, printk};
+use bootloader_api::{BootInfo, entry_point};
+use kernel::{pm::hcf, printlnk};
 
-const CONFIG: BootloaderConfig = BootloaderConfig::new_default();
+// const CONFIG: BootloaderConfig = BootloaderConfig::new_default();
 
-fn kmain(boot_info: &'static mut BootInfo) -> ! {
-    // let mut a = unsafe { Uart16550::init(Default::default()) }.unwrap().com1;
-    // write!(a, "test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
-    printk!("test").unwrap();
+fn kmain(_boot_info: &'static mut BootInfo) -> ! {
+    _ = printlnk!("test");
     hcf()
 }
 

@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+acpi = "6.1.1"
+atomic = "0.6.1"
 bootloader_api = { git = "https://github.com/rust-osdev/bootloader" }
+linkme = "0.3.37"
 uart_16550 = "0.8.0"

@@ -22,3 +22,6 @@ thanks ("https://www.reddit.com/r/cpp/comments/1w6us70/optimizing_a_spinlock/")[
 
 == panic & backtrace
 thanks ("https://eli.thegreenplace.net/2011/02/07/how-debuggers-work-part-3-debugging-information")[Eli] teaching basic concepts and ("https://wiki.osdev.org/Stack_Trace")[osdev] for a practical example
+
+== exceptions
+used x86_64 crate however still read ("https://os.phil-opp.com/edition-1/extra/naked-exceptions/")[this blog] to understand

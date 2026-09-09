@@ -1,5 +1,10 @@
 i got inspiration from this #link("https://os.phil-opp.com")[blog]
 
+== notes
+will use as much crates as possible
+- has to be up to standards
+- has high quality
+
 == booatloader selection
 i could just use qemu skipping to kernel but i wanted to explore about bootloaders too since im making a os, but i dont wanna spend all my time just doing repetitive stuff and dealing with legacy stuff
 two realistic options only:

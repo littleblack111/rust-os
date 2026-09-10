@@ -35,19 +35,36 @@ fn main() {
     cmd.arg("-device").arg("isa-debug-exit,iobase=0xf4,iosize=0x04");
 
     if uefi {
-        let prebuilt =
-            Prebuilt::fetch(Source::LATEST, "target/ovmf").expect("failed to update prebuilt");
+        let prebuilt = Prebuilt::fetch(
+            Source::LATEST,
+            "target/ovmf",
+        )
+        .expect("failed to update prebuilt");
 
-        let code = prebuilt.get_file(Arch::X64, FileType::Code);
-        let vars = prebuilt.get_file(Arch::X64, FileType::Vars);
+        let code = prebuilt.get_file(
+            Arch::X64,
+            FileType::Code,
+        );
+        let vars = prebuilt.get_file(
+            Arch::X64,
+            FileType::Vars,
+        );
 
         cmd.arg("-drive").arg(format!("format=raw,file={uefi_path}"));
-        cmd.arg("-drive")
-            .arg(format!("if=pflash,format=raw,unit=0,file={},readonly=on", code.display()));
+        cmd.arg("-drive").arg(
+            format!(
+                "if=pflash,format=raw,unit=0,file={},readonly=on",
+                code.display()
+            ),
+        );
         // copy vars and enable rw instead of snapshot if you want to store data
         // (e.g. enroll secure boot keys)
-        cmd.arg("-drive")
-            .arg(format!("if=pflash,format=raw,unit=1,file={},snapshot=on", vars.display()));
+        cmd.arg("-drive").arg(
+            format!(
+                "if=pflash,format=raw,unit=1,file={},snapshot=on",
+                vars.display()
+            ),
+        );
     } else {
         cmd.arg("-drive").arg(format!("format=raw,file={bios_path}"));
     }

@@ -6,7 +6,10 @@ use bytemuck::{Pod, Zeroable};
 static KERNEL_VIRTUAL_BASE: Atomic<PhysicalMemoryAddress> = Atomic::new(PhysicalMemoryAddress(0));
 
 pub fn init(kernel_virtual_base: PhysicalMemoryAddress) {
-    KERNEL_VIRTUAL_BASE.store(kernel_virtual_base, Ordering::Relaxed);
+    KERNEL_VIRTUAL_BASE.store(
+        kernel_virtual_base,
+        Ordering::Relaxed,
+    );
 }
 
 #[derive(Clone, Copy, Pod, Zeroable)]

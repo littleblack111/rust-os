@@ -1,9 +1,7 @@
-use crate::init::cpu::int;
-
 pub mod acpi;
-pub mod earlyprintk;
 pub mod cpu;
+pub mod earlyprintk;
 
 pub fn init() {
-    int::init();
+    cpu::int::init();
 }

@@ -41,13 +41,24 @@ impl Uart16550 {
     ) -> Result<Self, Uart16550TtyError<PortIoAddress>> {
         let mut addrs = SerialPortAddress::iter();
 
-        Ok(Self {
-            coms: array::try_from_fn(|i| {
-                config[i]
-                    .take()
-                    .map(|c| unsafe { Uart16550Tty::new_port(addrs.next().unwrap().into(), c) })
-                    .transpose()
-            })?,
-        })
+        Ok(
+            Self {
+                coms: array::try_from_fn(
+                    |i| {
+                        config[i]
+                            .take()
+                            .map(
+                                |c| unsafe {
+                                    Uart16550Tty::new_port(
+                                        addrs.next().unwrap().into(),
+                                        c,
+                                    )
+                                },
+                            )
+                            .transpose()
+                    },
+                )?,
+            },
+        )
     }
 }

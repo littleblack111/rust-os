@@ -1,5 +1,10 @@
 [workspace]
 resolver = "3"
 members = ["x"]
-exclude = ["kernel"]
 default-members = ["x"]
+
+# [profile.dev]
+# panic = "abort"
+
+# [profile.release]
+# panic = "abort"

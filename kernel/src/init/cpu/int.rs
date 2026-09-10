@@ -1,4 +1,4 @@
-use crate::init::int::idt::IDT;
+use crate::init::cpu::int::idt::IDT;
 
 pub mod idt;
 

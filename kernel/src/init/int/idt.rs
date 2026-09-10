@@ -1,3 +1,8 @@
+use spin::LazyLock;
+use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+
+use crate::init::earlyprintk::printlnk;
+
 pub static IDT: LazyLock<InterruptDescriptorTable> = LazyLock::new(
     || {
         let mut idt = InterruptDescriptorTable::new();
@@ -7,14 +12,13 @@ pub static IDT: LazyLock<InterruptDescriptorTable> = LazyLock::new(
     },
 );
 
-extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, error_code: u64) -> ! {
+extern "x86-interrupt" fn double_fault_handler(
+    stack_frame: InterruptStackFrame,
+    error_code: u64,
+) -> ! {
     panic!("EXCEPTION: DOUBLE FAULT\n{stack_frame:#?}\nERROR CODE:{error_code}");
 }
 
 extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
     _ = printlnk!("EXCEPTION: BREAKPOINT\n{stack_frame:#?}");
-}
-
-pub fn init() {
-    IDT.load();
 }

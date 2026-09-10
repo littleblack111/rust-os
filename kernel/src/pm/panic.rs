@@ -1,6 +1,6 @@
 use core::panic::PanicInfo;
 
-use crate::{pm::hcf, printlnk};
+use crate::{init::earlyprintk::printlnk, pm::hcf};
 
 #[allow(dead_code)]
 #[cfg_attr(

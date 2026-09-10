@@ -4,7 +4,10 @@
 // extern crate alloc;
 
 use bootloader_api::{BootInfo, entry_point};
-use kernel::{init, pm::hcf, printlnk};
+use kernel::{
+    init::{self, earlyprintk::printlnk},
+    pm::hcf,
+};
 
 // const CONFIG: BootloaderConfig = BootloaderConfig::new_default();
 

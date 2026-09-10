@@ -1,6 +1,7 @@
-use spin::LazyLock;
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
-
-use crate::printlnk;
+use crate::init::int::idt::IDT;
 
 pub mod idt;
+
+pub fn init() {
+    IDT.load();
+}
